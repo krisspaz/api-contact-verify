@@ -1,7 +1,7 @@
 {
-    "name": "api-contact-verify",
-    "version": "1.0.0",
-    "description": "API para verificar emails y números de WhatsApp",
+    "name": "contact-intelligence-api",
+    "version": "2.0.0",
+    "description": "Complete contact verification and intelligence API. Verify emails, WhatsApp, detect fraud, score leads, discover social profiles.",
     "main": "src/index.js",
     "scripts": {
         "start": "node src/index.js",

@@ -1,124 +1,186 @@
-# 📧 API Contact Verify
+# Contact Intelligence API v2.0.0
 
-API para verificar emails y números de WhatsApp.
+Complete contact verification and intelligence platform. Verify emails, WhatsApp numbers, detect fraud, score leads, and discover social profiles.
 
-## 🚀 Inicio Rápido
+## 🚀 Features
+
+| Feature | Description |
+|---------|-------------|
+| ✅ **Email Verification** | Syntax, MX records, SMTP check, disposable detection |
+| ✅ **WhatsApp Verification** | 200+ countries, number validation, link generation |
+| 🆕 **Quality Score (0-100)** | Single score indicating contact quality |
+| 🆕 **Fraud Detection** | AI-based risk scoring and pattern detection |
+| 🆕 **Social Profile Discovery** | Find LinkedIn, Twitter, Gravatar, and more |
+| 🆕 **Carrier Intelligence** | Operator, line type, VOIP detection, SMS deliverability |
+| 🆕 **Bulk Processing** | Process thousands of contacts with webhook callbacks |
+
+## 📦 Installation
 
 ```bash
 npm install
 cp .env.example .env
+# Edit .env with your configuration
 npm start
 ```
 
-La API corre en `http://localhost:3002`
+## 🔑 Authentication
 
-## 📖 Endpoints
+All endpoints require an API key in the header:
 
-### Email Verification
-
-#### `POST /api/email/verify`
-Verificación completa de email (formato, MX, disposable, role).
-
-```bash
-curl -X POST http://localhost:3002/api/email/verify \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: tu-api-key" \
-  -d '{"email": "usuario@gmail.com"}'
+```
+x-api-key: your-api-key
 ```
 
-**Respuesta:**
+For RapidAPI, use:
+```
+x-rapidapi-key: your-rapidapi-key
+```
+
+## 📡 API Endpoints
+
+### Original Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/email/verify` | Verify single email |
+| POST | `/api/email/batch` | Verify multiple emails |
+| POST | `/api/whatsapp/verify` | Verify WhatsApp number |
+| POST | `/api/whatsapp/link` | Generate WhatsApp link with QR |
+
+### NEW Premium Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/contact/analyze` | **Complete contact analysis** (all features in one call) |
+| POST | `/api/contact/score` | Get quality score only (faster) |
+| POST | `/api/contact/fraud-check` | Fraud detection only |
+| POST | `/api/social/lookup` | Discover social profiles |
+| POST | `/api/social/enrich` | Full contact enrichment |
+| GET | `/api/social/gravatar/:email` | Get Gravatar info |
+| POST | `/api/carrier/lookup` | Get carrier information |
+| POST | `/api/carrier/sms-check` | Check SMS deliverability |
+| POST | `/api/carrier/batch` | Batch carrier lookup |
+| POST | `/api/bulk/process` | Start async bulk job |
+| GET | `/api/bulk/status/:jobId` | Check job status |
+| GET | `/api/bulk/results/:jobId` | Get full results |
+
+## 💡 Usage Examples
+
+### Complete Contact Analysis
+
+```bash
+curl -X POST https://your-api.com/api/contact/analyze \
+  -H "x-api-key: your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@company.com",
+    "phone": "14155551234"
+  }'
+```
+
+**Response:**
 ```json
 {
   "success": true,
-  "email": "usuario@gmail.com",
-  "valid": true,
-  "checks": {
-    "format": true,
-    "mx": true,
-    "smtp": null,
-    "disposable": false,
-    "role_account": false
+  "quality_score": {
+    "score": 85,
+    "grade": "A",
+    "quality": "good"
   },
-  "details": {
-    "domain": "gmail.com",
-    "mx_records": ["gmail-smtp-in.l.google.com"]
+  "fraud_analysis": {
+    "overall_risk_level": "low",
+    "overall_risk_score": 10
+  },
+  "carrier_info": {
+    "carrier": "AT&T",
+    "line_type": "mobile",
+    "is_voip": false
+  },
+  "summary": {
+    "is_valid": true,
+    "is_safe": true,
+    "recommendation": "Excellent contact - safe to proceed"
   }
 }
 ```
 
-#### `POST /api/email/quick`
-Verificación rápida (solo formato y MX).
-
-#### `POST /api/email/batch`
-Verificar múltiples emails (máx 50).
+### Social Profile Discovery
 
 ```bash
-curl -X POST http://localhost:3002/api/email/batch \
-  -H "x-api-key: tu-api-key" \
+curl -X POST https://your-api.com/api/social/lookup \
+  -H "x-api-key: your-key" \
   -H "Content-Type: application/json" \
-  -d '{"emails": ["test@gmail.com", "fake@tempmail.com"], "quick": true}'
+  -d '{"email": "john.doe@company.com"}'
 ```
 
----
-
-### WhatsApp Verification
-
-#### `POST /api/whatsapp/verify`
-Verificar número de WhatsApp.
+### Bulk Processing with Webhook
 
 ```bash
-curl -X POST http://localhost:3002/api/whatsapp/verify \
+curl -X POST https://your-api.com/api/bulk/process \
+  -H "x-api-key: your-key" \
   -H "Content-Type: application/json" \
-  -H "x-api-key: tu-api-key" \
-  -d '{"phone": "+52 55 1234 5678"}'
+  -d '{
+    "contacts": [
+      {"email": "user1@gmail.com", "phone": "14155551234"},
+      {"email": "user2@company.com", "phone": "447911123456"}
+    ],
+    "webhook_url": "https://your-server.com/webhook",
+    "options": {
+      "include_score": true,
+      "include_fraud": true
+    }
+  }'
 ```
 
-**Respuesta:**
-```json
-{
-  "success": true,
-  "phone": "+52 55 1234 5678",
-  "normalized": "525512345678",
-  "valid": true,
-  "has_whatsapp": true,
-  "checks": {
-    "format": true,
-    "country_code": true,
-    "length": true
-  },
-  "details": {
-    "country_code": "52",
-    "country": "MX",
-    "whatsapp_link": "https://wa.me/525512345678"
-  }
-}
+## 📊 Quality Score Breakdown
+
+| Score | Grade | Quality | Meaning |
+|-------|-------|---------|---------|
+| 90-100 | A+ | Excellent | Premium lead, fully verified |
+| 80-89 | A | Good | High quality, safe to proceed |
+| 70-79 | B | Good | Minor issues, generally safe |
+| 50-69 | C-D | Fair | Some concerns, verify further |
+| 0-49 | F | Bad | High risk, additional verification needed |
+
+## 🛡️ Fraud Risk Levels
+
+| Level | Score | Action |
+|-------|-------|--------|
+| Minimal | 0-19 | Safe to proceed |
+| Low | 20-39 | Normal processing |
+| Medium | 40-69 | Proceed with caution |
+| High | 70-100 | Block or require verification |
+
+## 💰 Pricing Plans (RapidAPI)
+
+| Plan | Price | Requests/month | Features |
+|------|-------|----------------|----------|
+| Basic | FREE | 100 | Email + WhatsApp verification |
+| Pro | $19.99 | 5,000 | + Quality Score + Carrier Intel |
+| Ultra | $49.99 | 25,000 | + Social Lookup + Fraud Detection |
+| Mega | $149.99 | 100,000 | All features + Bulk API |
+
+## 📝 Environment Variables
+
+```env
+# API Keys
+API_KEYS=key1,key2,key3
+RAPIDAPI_PROXY_SECRET=your-secret
+
+# Server
+PORT=3002
+NODE_ENV=production
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_MAX_REQUESTS=100
 ```
 
-#### `POST /api/whatsapp/quick`
-Verificación rápida (solo formato).
+## 🔗 Links
 
-#### `POST /api/whatsapp/batch`
-Verificar múltiples números (máx 25).
+- [RapidAPI Listing](https://rapidapi.com/krispaz77/api/worldwide-contact-verifier)
+- [API Documentation](/api/docs)
 
-#### `POST /api/whatsapp/link`
-Generar link de WhatsApp con mensaje.
+## 📄 License
 
-```bash
-curl -X POST http://localhost:3002/api/whatsapp/link \
-  -H "x-api-key: tu-api-key" \
-  -H "Content-Type: application/json" \
-  -d '{"phone": "525512345678", "message": "Hola, quiero información"}'
-```
-
-## 💰 Monetización (RapidAPI)
-
-| Plan | Precio | Requests/mes |
-|------|--------|--------------|
-| Free | $0 | 50 |
-| Basic | $9.99 | 1,000 |
-| Pro | $29.99 | 10,000 |
-| Business | $99.99 | 100,000 |
-
-## 🚀 Deploy
-
-Mismo proceso que API QR - Railway o Render.
+MIT License
